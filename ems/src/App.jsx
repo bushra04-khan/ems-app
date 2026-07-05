@@ -1,5 +1,5 @@
 
-import React from 'react'
+import React, { useContext } from 'react'
 import Login from "./component/Auth/login";
 import Header from "./component/other/header";
 import EmployeeDashboard from "./component/Dashboard/EmployeeDashboard";
@@ -7,6 +7,7 @@ import AdminDashboard from "./component/Dashboard/AdminDashboard";
 import { getLocalStorage ,setLocalStorage} from './utils/localStorage';
 import {useEffect,useState} from 'react'
 import Employeedashboard from './component/Dashboard/EmployeeDashboard';
+import { AuthContext } from './context/AuthProvider';
 
 function App() {
 
@@ -19,17 +20,19 @@ function App() {
   const handleLogin = (email,password) =>{
     if(email== 'admin@me.com' && password=='123'){
     setUser('admin')
-
+    
   }
   else  if(email== 'user@me.com' && password=='123'){
     setUser('user')
-
+  
   }
   else{
     alert("Invalid credentials")
   }
 }
 
+const data = useContext(AuthContext)
+console.log(data)
   return (
     <>
     {!user ?<Login handleLogin={handleLogin} />: ''}
