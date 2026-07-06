@@ -1,44 +1,57 @@
-
-import React, { useContext } from 'react'
 import Login from "./component/Auth/login";
 import Header from "./component/other/header";
 import EmployeeDashboard from "./component/Dashboard/EmployeeDashboard";
 import AdminDashboard from "./component/Dashboard/AdminDashboard";
-import { getLocalStorage ,setLocalStorage} from './utils/localStorage';
-import {useEffect,useState} from 'react'
-import Employeedashboard from './component/Dashboard/EmployeeDashboard';
-import { AuthContext } from './context/AuthProvider';
+import { getLocalStorage, setLocalStorage } from "./utils/localStorage";
+import { useEffect, useState } from "react";
+import Employeedashboard from "./component/Dashboard/EmployeeDashboard";
+import { useContext } from 'react'
+import { AuthContext } from "./context/AuthContext";
 
 function App() {
+  useEffect(() => {
+    setLocalStorage();
+    getLocalStorage();
+  }, []);
+
+  const [user, setUser] = useState(null);
+
+  const authData = useContext(AuthContext);
 
   useEffect(() => {
-    setLocalStorage()
-    getLocalStorage()
-  },[] )
+    if (authData) {
+      const loggedInUser = localStorage.getItem("loggedInUser");
+      if (loggedInUser) {
+        const userData = JSON.parse(loggedInUser);
+        setUser(userData.role);
+      }
+    }
+  }, [authData]);
 
-  const [user, setUser] = useState(null)
-  const handleLogin = (email,password) =>{
-    if(email== 'admin@me.com' && password=='123'){
-    setUser('admin')
-    
-  }
-  else  if(email== 'user@me.com' && password=='123'){
-    setUser('user')
-  
-  }
-  else{
-    alert("Invalid credentials")
-  }
-}
+  const handleLogin = (email, password) => {
+    if (email == "admin@me.com" && password == "123") {
+      setUser("admin");
+      localStorage.setItem("loggedInUser", JSON.stringify({ role: "admin" }));
+    } else if (
+      authData &&
+      authData.employees.find((e) => email == e.email && e.password == password)
+    ) {
+      setUser("employee");
+      localStorage.setItem(
+        "loggedInUser",
+        JSON.stringify({ role: "employee" }),
+      )
+    } else {
+      alert("Invalid credentials");
+    }
+  };
 
-const data = useContext(AuthContext)
-console.log(data)
   return (
     <>
-    {!user ?<Login handleLogin={handleLogin} />: ''}
-    {user== 'admin' ? <AdminDashboard /> : <Employeedashboard />}
+      {!user ? <Login handleLogin={handleLogin} /> : ""}
+      {user == "admin" ? <AdminDashboard /> : <Employeedashboard />}
     </>
-  )
+  );
 }
 
 export default App;
